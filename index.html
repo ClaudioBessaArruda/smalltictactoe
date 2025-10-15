@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Tic Tac Toe</title>
+<body style="margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#000;color:#fff;font-family:sans-serif">
+<h1 style="margin: 100px;"> Tic Tac Toe </h1>
+<svg id="S" viewBox="0 0 300 300" width="480" height="480" style="cursor:pointer">
+  <line x1="100" y1="0" x2="100" y2="300" stroke="white" stroke-width="4"/>
+  <line x1="200" y1="0" x2="200" y2="300" stroke="white" stroke-width="4"/>
+  <line x1="0" y1="100" x2="300" y2="100" stroke="white" stroke-width="4"/>
+  <line x1="0" y1="200" x2="300" y2="200" stroke="white" stroke-width="4"/>
+</svg>
+<div id="msg" style="margin-top:20px;font-size:32px;min-height:1em"></div>
+<script>
+const svg=document.getElementById('S'), msg=document.getElementById('msg');
+let turn='X', cells=Array(9).fill(null);
+const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+function reset(){
+  [...svg.querySelectorAll('circle,line:not(:nth-child(-n+4))')].forEach(e=>e.remove());
+  cells.fill(null); turn='X'; msg.textContent='';
+}
+
+function checkWin(){
+  for(let [a,b,c] of wins)
+    if(cells[a]&&cells[a]==cells[b]&&cells[a]==cells[c]) return cells[a];
+  return cells.every(Boolean)?'draw':null;
+}
+
+function showMsg(text){
+  msg.textContent=text;
+  setTimeout(reset,1200);
+}
+
+svg.onclick=e=>{
+  const pt=svg.createSVGPoint(); pt.x=e.clientX; pt.y=e.clientY;
+  const p=pt.matrixTransform(svg.getScreenCTM().inverse());
+  const c=Math.floor(p.x/100), r=Math.floor(p.y/100);
+  if(c<0||c>2||r<0||r>2)return;
+  const i=r*3+c;
+  if(cells[i])return;
+  const x=c*100+50,y=r*100+50;
+  if(turn==='X'){
+    svg.insertAdjacentHTML('beforeend',
+      `<line x1="${x-28}" y1="${y-28}" x2="${x+28}" y2="${y+28}" stroke="red" stroke-width="6"/>
+       <line x1="${x+28}" y1="${y-28}" x2="${x-28}" y2="${y+28}" stroke="red" stroke-width="6"/>`);
+    cells[i]='X'; turn='O';
+  }else{
+    svg.insertAdjacentHTML('beforeend',
+      `<circle cx="${x}" cy="${y}" r="30" stroke="blue" stroke-width="6" fill="none"/>`);
+    cells[i]='O'; turn='X';
+  }
+  let w=checkWin();
+  if(w) showMsg(w==='draw'?'Draw!':`${w} wins!`);
+};
+</script>
+<footer style="margin: 100px;"><p>Made by <a href="https://github.com/ClaudioBessaArruda">ClaudioBessaArruda</a></p></footer>
+</body>
+</html>
